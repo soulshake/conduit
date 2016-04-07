@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/ehazlett/conduit/hub"
-	"github.com/ehazlett/conduit/version"
+	"github.com/soulshake/conduit/hub"
+	"github.com/soulshake/conduit/version"
 	"github.com/gorilla/mux"
 	"github.com/samalba/dockerclient"
 )
