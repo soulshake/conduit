@@ -85,6 +85,7 @@ func (m *Manager) receive(w http.ResponseWriter, r *http.Request) {
 	data := &hub.Webhook{}
 	if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+        log.Error(err)
 		return
 	}
 
@@ -106,9 +107,12 @@ func (m *Manager) receive(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		return
-	}
+	} else {
+        log.Infof(fmt.Sprintf("found repo: %s", repoName))
+    }
 
 	if err := m.deploy(repoName); err != nil {
+        log.Error(err)
 		w.WriteHeader(http.StatusInternalServerError)
 		responsePayload.State = "error"
 		responsePayload.Description = fmt.Sprintf("error deploying: %s", err)
@@ -154,6 +158,7 @@ func (m *Manager) sendResponse(payload *hub.CallbackPayload, callbackUrl string)
 
 	var buf bytes.Buffer
 	if err := json.NewEncoder(&buf).Encode(payload); err != nil {
+        log.Error(err)
 		return err
 	}
 
@@ -211,11 +216,13 @@ func (m *Manager) deploy(repo string) error {
 		m.allowInsecure,
 	)
 	if err != nil {
+        log.Error(err)
 		return err
 	}
 
 	containers, err := docker.ListContainers(false, false, "")
 	if err != nil {
+        log.Error(err)
 		return err
 	}
 
@@ -238,6 +245,7 @@ func (m *Manager) deploy(repo string) error {
 
 			cfg, err := docker.InspectContainer(c.Id)
 			if err != nil {
+                log.Error(err)
 				return err
 			}
 
@@ -246,6 +254,7 @@ func (m *Manager) deploy(repo string) error {
 
 			id, err := docker.CreateContainer(cfg.Config, "")
 			if err != nil {
+                log.Error(err)
 				return err
 			}
 
@@ -257,16 +266,19 @@ func (m *Manager) deploy(repo string) error {
 			// check for port bindings; if exist, stop/remove container first
 			if portBinds {
 				if err := m.removeContainer(c.Id); err != nil {
+                    log.Error(err)
 					return err
 				}
 			}
 
 			if err := docker.StartContainer(id, cfg.HostConfig); err != nil {
+                log.Error(err)
 				return err
 			}
 
 			if !portBinds {
 				if err := m.removeContainer(c.Id); err != nil {
+                    log.Error(err)
 					return err
 				}
 			}
@@ -288,16 +300,19 @@ func (m *Manager) removeContainer(id string) error {
 		m.allowInsecure,
 	)
 	if err != nil {
+        log.Error(err)
 		return err
 	}
 
 	log.Debugf("%s: stopping old container", cId)
 	if err := docker.StopContainer(id, 5); err != nil {
+        log.Error(err)
 		return err
 	}
 
 	log.Debugf("%s: removing old container", cId)
 	if err := docker.RemoveContainer(id, true, true); err != nil {
+        log.Error(err)
 		return err
 	}
 

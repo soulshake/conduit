@@ -76,6 +76,7 @@ func GetDockerClient(dockerUrl, tlsCaCert, tlsCert, tlsKey string, allowInsecure
 
 	client, err := dockerclient.NewDockerClient(dockerUrl, tlsConfig)
 	if err != nil {
+        log.Error("error doing dockerclient.NewDockerClient: %s", err)
 		return nil, err
 	}
 

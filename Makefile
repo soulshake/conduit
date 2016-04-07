@@ -3,7 +3,7 @@ GOOS=linux
 GOARCH=amd64
 TAG=${TAG:-latest}
 NAME=conduit
-REPO=ehazlett/$(NAME)
+REPO=soulshake/$(NAME)
 
 all: deps build
 

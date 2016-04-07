@@ -5,8 +5,8 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/codegangsta/cli"
-	"github.com/ehazlett/conduit/manager"
-	"github.com/ehazlett/conduit/version"
+	"github.com/soulshake/conduit/manager"
+	"github.com/soulshake/conduit/version"
 )
 
 func run(c *cli.Context) {
@@ -21,6 +21,7 @@ func run(c *cli.Context) {
 	if len(tags) == 0 {
 		tags = []string{"latest"}
 	}
+    //log.Infof("Using tags %s", tags)
 
 	managerConfig := &manager.ManagerConfig{
 		ListenAddr:    c.String("listen"),
